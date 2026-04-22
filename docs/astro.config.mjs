@@ -41,31 +41,101 @@ export default defineConfig({
       },
       customCss: ['./src/styles/custom.css'],
       sidebar: [
+
         {
           label: 'Getting Started',
-          autogenerate: {
-            directory: 'getting-started',
-            collapsed:true,
-          },
+          items: [
+            {
+              label: 'Quickstart Guide',
+              collapsed: true,
+              autogenerate: {
+                directory: 'getting-started/Quickstart Guide',
+              },
+            },
+            {
+              label: 'Workspaces and Pages',
+              collapsed: true,
+              autogenerate: {
+                directory: 'getting-started/Workspaces and Pages',
+              },
+            },
+            {
+              label: 'Installation Guide',
+              collapsed: true,
+              autogenerate: {
+                directory: 'getting-started/Installation Guide',
+              },
+            }
+          ]
         },
 
         {
           label: 'Ingenuity Modules',
-          autogenerate: {
-            directory: 'modules',
-            collapsed: true,
-          },
+          items: [
+            {
+              label: 'Dashboards',
+              collapsed: true,
+              autogenerate: {
+                directory: 'modules/Dashboards',
+              },
+            },
+            {
+              label: 'Charts',
+              collapsed: true,
+              autogenerate: {
+                directory: 'modules/Charts',
+              },
+            },
+            {
+              label: 'Calculations',
+              collapsed: true,
+              autogenerate: {
+                directory: 'modules/Calculations',
+              },
+            },
+            {
+              label: 'Reports',
+              collapsed: true,
+              autogenerate: {
+                directory: 'modules/Reports',
+              },
+            },
+            {
+              label: 'Scripts',
+              collapsed: true,
+              autogenerate: {
+                directory: 'modules/Scripts',
+              },
+            },
+            {
+              label: 'Asset Model',
+              collapsed: true,
+              autogenerate: {
+                directory: 'modules/Asset Model',
+              },
+            },
+            {
+              label: 'Data Sources',
+              collapsed: true,
+              autogenerate: {
+                directory: 'modules/Data Sources',
+              },
+            },
+            
+          ],
         },
         {
           label: 'Developing with Eigen',
           items: [
             {
+              collapsed:true,
               label: 'Excel Addin',
               autogenerate: {
                 directory: 'developing-with-eigen/excel-addin',
               },
             },
             {
+              collapsed:true,
               label: 'Python Library',
               items: [
                 {
@@ -136,6 +206,7 @@ export default defineConfig({
               ],
             },
             {
+              collapsed:true,
               label: 'Office 365 Connector',
               badge: {
                 text: 'TBA',

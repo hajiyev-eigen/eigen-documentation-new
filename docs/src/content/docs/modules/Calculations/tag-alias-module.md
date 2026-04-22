@@ -2,7 +2,7 @@
 title: Tag Aliases & Alias Historian
 description: An overview of tag aliases and alias historians within the Ingenuity calculations module
 sidebar:
-    order: 4
+    order: 40
 
 ---
 

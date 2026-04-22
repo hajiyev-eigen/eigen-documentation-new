@@ -711,34 +711,6 @@ The Write Data component looks like this in the left-hand panel of widgets when 
 
 ![Write Data](~/assets/dashboards/write-data-component/image1.png)
 
-Drag and drop it onto a page and it shows as a blue button with the text Write Data. 
-
-:::note
- In an unscaled dashboard, the default button size is 2 wide x 1 high.  Depending on the width of the columns in your dashboard you may need to expand the size of the button). 
- :::
-
-![Write Data](~/assets/dashboards/write-data-component/image2.png)
-
-When the button is clicked, a form pops up for the user to enter the data to write.   
-
-![Write Data](~/assets/dashboards/write-data-component/image3.png)
-
-The timestamp can also be adjusted.  
-
-:::note
-The default hour and minute can be configured in the button configuration, for example 00:00.
-:::
-
-![Timestamp](~/assets/dashboards/write-data-component/image4.png)
-
-Multiple values can be written by clicking the [+] icon at the right-hand side
-
-![Timestamp](~/assets/dashboards/write-data-component/image5.png)
-
-Click “Write” to write the points to the data source(s). 
-
-![Timestamp](~/assets/dashboards/write-data-component/image6.png)
-
 #### Write Data Button Configuration
 
 ![Timestamp](~/assets/dashboards/write-data-component/image7.png)
@@ -823,6 +795,37 @@ The Background configuration is that same as any other dashboard component and g
 #### Type Configuration
 
 Not used.
+
+#### Using the Write Data Widget
+
+Drag and drop it onto a page and it shows as a blue button with the text Write Data. 
+
+:::note
+ In an unscaled dashboard, the default button size is 2 wide x 1 high.  Depending on the width of the columns in your dashboard you may need to expand the size of the button). 
+ :::
+
+![Write Data](~/assets/dashboards/write-data-component/image2.png)
+
+When the button is clicked, a form pops up for the user to enter the data to write.   
+
+![Write Data](~/assets/dashboards/write-data-component/image3.png)
+
+The timestamp can also be adjusted.  
+
+:::note
+The default hour and minute can be configured in the button configuration, for example 00:00.
+:::
+
+![Timestamp](~/assets/dashboards/write-data-component/image4.png)
+
+Multiple values can be written by clicking the [+] icon at the right-hand side
+
+![Timestamp](~/assets/dashboards/write-data-component/image5.png)
+
+Click “Write” to write the points to the data source(s). 
+
+![Timestamp](~/assets/dashboards/write-data-component/image6.png)
+
 
 :::note[Manual Data Entry]
 

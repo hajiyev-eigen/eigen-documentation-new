@@ -166,7 +166,7 @@ down to a Page level.
 ### 1.5.1 User Management
 
 Users are per-subscription and are managed under the Subscriptions
-module (Section 2.12).
+module [(Section 2.12)](https://docs.eigeningenuity.co/getting-started/quickstart-guide/modules-overview/#214-subscription).
 
 ## 1.6 Navigation
 
@@ -180,7 +180,7 @@ This page gives quick access to recent pages, training courses and four
 panels with current news or events of interest to users in that
 Subscription. The content of these four panels is specific to a
 Subscription and is managed by System Administrators in the Ingenuity
-Hub (See section 3.2).
+Hub [(see section 3.2)](https://docs.eigeningenuity.co/getting-started/quickstart-guide/admin/).
 
 ### 1.6.1 Screen areas
 
@@ -257,8 +257,8 @@ generated](~/assets/quick-start-guide/image17.png)
 #### *Left hand panel*
 
 The left hand panel is the main way to navigate within the system. At
-the top is the Workspace selector (see 1.6.2), access to the Page Tree
-(see 1.6.3) and the Modules (see section 2).
+the top is the Workspace selector [(see 1.6.2)](https://docs.eigeningenuity.co/getting-started/quickstart-guide/introduction/#162-workspaces), access to the Page Tree
+[(see 1.6.3)](https://docs.eigeningenuity.co/getting-started/quickstart-guide/introduction/#163-the-page-tree) and the Modules [(see section 2)](https://docs.eigeningenuity.co/getting-started/quickstart-guide/modules-overview/).
 
 
 ![A screenshot of a phone Description automatically generated](~/assets/quick-start-guide/image4.png)
@@ -285,7 +285,7 @@ user-specific settings:
 ![A screenshot of a phone Description automatically
 generated](~/assets/quick-start-guide/image20.png)
 
-This includes being able to select the Theme (see 1.7), edit user
+This includes being able to select the Theme [(see 1.7)](https://docs.eigeningenuity.co/getting-started/quickstart-guide/introduction/#17-themes-and-modes), edit user
 settings and Log Out.
 
 Superusers will have access to Ingenuity Hub
@@ -310,7 +310,7 @@ in the right hand panel
 #### *Bottom right hand corner*
 
 There is normally nothing in the bottom right corner unless the current
-page is in Kiosk mode (see 1.10). In this case there is a barely visible
+page is in Kiosk mode [(see 1.10)](https://docs.eigeningenuity.co/getting-started/quickstart-guide/introduction/#110-displaying-content--kiosk-mode). In this case there is a barely visible
 button to exit Kiosk mode that only appears clickable when the mouse
 cursor is over it:
 
@@ -430,7 +430,7 @@ The following chart types are available:
 ![A screenshot of a phone Description automatically
 generated](~/assets/quick-start-guide/image36.png)
 
-See [section 2.3](#23-charts) below for more details, and Product Manual Section 6.
+See [section 2.3](#23-charts) below for more details, and [(Product Manual - Charts)](https://docs.eigeningenuity.co/modules/charts/overview/).
 
 ## 1.9 Creating Content
 

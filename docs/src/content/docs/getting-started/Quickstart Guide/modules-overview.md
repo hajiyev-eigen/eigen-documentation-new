@@ -135,10 +135,11 @@ Scaled:
 automatically
 generated](~/assets/quick-start-guide/image56.png)
 
-**TIP**
+:::tip
 
-*It is best to use the Scaled dashboard when overlaying data on a
+It is best to use the Scaled dashboard when overlaying data on a
 background image*
+:::
 
 ### 2.2.2 Adding Components
 
@@ -186,12 +187,6 @@ in the bar at the top.
 
 ![A screenshot of a graph Description automatically
 generated](~/assets/quick-start-guide/image58.png)
-
-Legend
-
-Chart area
-
-Controls
 
 ### 2.3.2 Live mode & setting the time range
 
@@ -561,10 +556,10 @@ generated](~/assets/quick-start-guide/image85.png)
 ## 2.6 Scripts
 
 Scripts are essential for automating workflows and making more advanced
-functionality. The Scripts module in Ingenuity is NodeRed; a
+functionality. The Scripts module in Ingenuity is NodeRed<sup>TM</sup>; a
 flow-based, low-code development tool for visual programming .
 
-NodeRed is the next evolution of Excel for engineers.
+NodeRed<sup>TM</sup> is the next evolution of Excel for engineers.
 
 ![A screenshot of a computer Description automatically
 generated](~/assets/quick-start-guide/image86.png)
@@ -572,7 +567,7 @@ generated](~/assets/quick-start-guide/image86.png)
 Scripts can be created to do all kinds of tasks from importing data,
 checking data, combining data, performing actions and exposing new APIs.
 
-NodeRed is a Node.js based application and the functions are written in
+NodeRed<sup>TM</sup> is a Node.js based application and the functions are written in
 JavaScript, which is very easy to learn.
 
 Examples of workflows that can be created quickly are:
@@ -619,8 +614,7 @@ Information on using Cypher is available at
 <https://neo4j.com/docs/cypher-manual/current/introduction/>
 
 Information in the Knowledge Graph is used in the Search results
-(section 1.12) Common Menu (1.12.1) , Asset Model (2.8) and Asset
-dashboard component (2.2.2).
+[(section 1.12)](https://docs.eigeningenuity.co/getting-started/quickstart-guide/introduction/#112-search) Common Menu [(1.12.1)](https://docs.eigeningenuity.co/getting-started/quickstart-guide/introduction/#1121-the-common-menu) , Asset Model [(2.8)](#28-asset-model) and Asset dashboard component [(2.2.2)](https://docs.eigeningenuity.co/getting-started/quickstart-guide/modules-overview/#22-dashboards).
 
 ## 2.8 Asset Model
 
