@@ -971,7 +971,7 @@ HIGHPASS= tag – LOWPASS(tag, cutoff)
 And vice-versa
 :::
 
-### 2.13.5 LOWPASS
+### 2.13.6 LOWPASS
 
 The LOWPASS function applies a filter to a timeseries that lets the high frequencies pass and filters out the low frequencies.  The syntax for the LOWPASS function is: 
 

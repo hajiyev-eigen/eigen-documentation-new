@@ -101,7 +101,9 @@ For example, in this case, to convert the 6 minute pulse count on the
 cold water to liters and totalize the value over the day, you would use
 the formula:
 
+```
 calc/DIV(TOTALISERAW(\<\<\>\>, DAY, BEGIN_DAY, 6m),11)
+```
 
 ![A screenshot of a phone AI-generated content may be
 incorrect.](~/assets/dashboards/image108.png)

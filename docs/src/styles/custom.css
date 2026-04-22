@@ -2,20 +2,45 @@
   justify-content: center;
 } */
 
+/* Sidebar - Nested Heading font size */
 .sidebar-content ul ul .group-label span.large {
   font-weight: normal;
+  font-size: 14px;
 }
+/* Sidebar - Nested Heading hover color*/
+.sidebar-content ul ul .group-label span.large:hover {
+  color: #f1c40f;
+}
+
+/* Sidebar - Highlighted page when selected*/
 .sidebar-content a[aria-current="page"] {
   background-color: #f1c40f;
   color: black;
 }
 
+/* Link Hover (including sidebar links) */
+a:hover {
+  color: #f1c40f;
+}
+
+/* Navgiation Buttons - Padding*/
 .nova-pagination-link {
   border: 2px solid #f1c40f;
   border-radius: 8px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
+/* Navgiation Buttons - Colour*/
 .nova-pagination-link:hover {
+  background-color: #f1c40f;
+  color: black;
+}
+
+/* Landing Page Button */
+.nova-link-button-primary:hover {
   background-color: #f1c40f;
   color: black;
 }

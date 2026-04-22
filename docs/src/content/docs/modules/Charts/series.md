@@ -47,7 +47,7 @@ The values of the different Series on the chart may well have quite
 different range values. It is therefore possible to have each Series
 plotted against a different axis (up to a maximum of 8 axes). There are
 four on the left, and four on the right. Simply choose which axis to use
-from the dropdown list. See [sections 2.7.8](#278-changing-axis-scales) for details on how to change the format of the axes if
+from the dropdown list. [(See sections 2.7.8)](/modules/charts/display-options/#278-changing-axis-scales) for details on how to change the format of the axes if
 necessary.
 
 ![A screenshot of a computer Description automatically

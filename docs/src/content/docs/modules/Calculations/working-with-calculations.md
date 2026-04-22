@@ -2,7 +2,7 @@
 title: Working with Calculations
 description: An overview of the aspects of working with calculations within the Ingenuity calculations module
 sidebar:
-    order: 5
+    order: 41
 
 ---
 
