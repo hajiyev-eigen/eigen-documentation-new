@@ -1,0 +1,832 @@
+---
+title: Retreiving Data
+description: Reading Values from the Historian API
+sidebar:
+  order: 3
+---
+
+Historian Multi Request API is set of Ingenuity APIs for retrieving any arbitrary set of data stored in connected historians, timeseries databases.
+
+## 1. Authentication
+
+All requests need to be authenticated using API Key, passed as apikey query parameter or X-Api-Key HTTP header.
+
+## 2. Limits
+
+Set of requests will return error if not all sub-requests were retrieved within 30s. This is to prevent server overload and to return response before proxy timeouts are hit.
+
+For a single request, following checks are evaluated before execution:
+
+### 2.1. Maximum number of points requested
+
+- **Default:**`100,000`
+- **Description:**
+  This is the total number of points requested across all requests in a single call.
+
+  - For `RAW_POINTS`, this corresponds to `maxPoints`
+  - For `INTERPOLATED_POINTS`, this corresponds to `count`
+  - All other request types count as **1 point each**
+
+---
+
+### 2.2. Maximum number of effective points
+
+- **Default:**`500,000`
+- **Description:**
+  This represents the **actual load on the historian**, accounting for how many underlying points must be fetched.
+
+  **Example:**
+
+  `calc/ADD(tagA,tagB)` counts as `points(tagA) + points(tagB)`
+
+  This value can increase rapidly when using:
+
+  - calculated tags (`calc/...`)
+  - wide time ranges
+  - interpolated queries
+
+  ***
+
+  ### 2.3. Maximum number of effective tags
+
+  - **Default:**`100`
+  - **Description:**
+    This counts the number of **underlying tags**required to fulfil a request.
+
+  **Example:**
+  `calc/ADD(tagA, calc/SUB(tagB, tagC))` counts as:
+
+  - tagA
+  - tagB
+  - tagC
+
+  → Total: **3 effective tags**
+
+## 3. Request structure
+
+All requests must be ran as POST request and provided a json payload as below. Each request follows similar pattern:
+
+```json
+{
+  "now": "2024-02-01T12:00:00Z", // optional `now` parameter, defaults to wall clock now
+  "timeZone": "Europe/Oslo", // optional time zone parameter, defaults to Ingenuity time zone
+  "requests": {
+    "request1": {
+      // label of first request, response will be returned under the same key
+      "type": "REQUEST_TYPE",
+      "tag": "historianName/tagName",
+      "details": {} // additional parameters for given request
+    }
+    // more requests can be added here with unique labels
+  }
+}
+```
+
+### 3.1 Timestamp Formats
+
+Some methods require a timestamp field, our APIs accept several formats:
+
+- Most ISO Formats
+  - 2026-04-22T23:59:49Z
+  - 2026-04-22T21:59:49+02:00
+  - 2026-04-22T21:59:49[Europe/Oslo]
+- Unix/Epoch Seconds or Milliseconds
+  - 1776902389
+  - 1776902389000
+- Relative Timestamps
+  - now
+  - yesterday
+  - 4 hours ago
+  - 7 days ago at 00:00
+  - today at midnight
+
+## 4. Request Types/Methods
+
+All queries require a historian name and a tag name
+
+<Tabs>
+<TabItem label="Current"> 
+  
+**Request Type**
+    
+  CURRENT_POINT
+
+**Input Parameters**
+
+- **now**: timestamp (Optional)
+
+**Description**
+
+    Return current value of given tag. If now parameter is passed in request, these requests are returning last known point before this timestamp
+
+**Example**
+
+**_Request_**:
+
+```json
+{
+  "requests": {
+    "label": {
+      "type": "CURRENT_POINT",
+      "tag": "calc/TOTALISE2(constants/1, MONTH, BEGIN_MONTH, 1d)",
+      "details": {}
+    }
+  }
+}
+```
+
+**_Result_**:
+
+```json
+{
+  "results": {
+    "label": {
+      "dataPoint": {
+        "timestamp": "2023-09-25T17:29:04.446620788+02:00",
+        "value": 24.728523680555632
+      }
+    }
+  },
+  "errors": {},
+  "now": "2023-09-25T17:29:04.446620788+02:00"
+}
+```
+
+**Curl Sample**
+
+```bash
+curl -X POST \
+https://demo.eigen.co/historian/multi \
+  -H 'Content-Type: application/json' \
+  -H 'X-Api-Key: READONLYKEY' \
+  --insecure \
+  -d '
+  {
+    "requests": {
+      "label": {
+        "type": "CURRENT_POINT",
+        "tag": "calc/TOTALISE2(constants/1, MONTH, BEGIN_MONTH, 1d)",
+        "details": {}
+      }
+    }
+  }
+'
+```
+
+</TabItem>
+<TabItem label="Single Historical">
+  **Request Type**
+  
+  HISTORICAL_POINT
+
+**Input Parameters**
+
+- **at**: timestamp
+
+**Description**
+
+Return value at specific point in time (may be interpolated value between points, depending on historian)
+
+**Example**
+
+**_Request_**:
+
+```json
+{
+  "requests": {
+    "label": {
+      "type": "HISTORICAL_POINT",
+      "tag": "Demo-influxdb/DEMO_02TI301.PV",
+      "details": {
+        "at": "2023-09-25T17:29:04+02:00" // Any ISO or unix timestamp supported
+      }
+    }
+  }
+}
+```
+
+**_Result_**:
+
+```json
+{
+  "results": {
+    "label": {
+      "dataPoint": {
+        "timestamp": "2023-09-25T15:29:04Z",
+        "value": null,
+        "enumString": null,
+        "message": null
+      }
+    }
+  },
+  "errors": {},
+  "now": "2026-04-24T14:29:58.715607424Z"
+}
+```
+
+**Curl Sample**
+
+```bash
+curl -X POST \
+https://demo.eigen.co/historian/multi \
+  -H 'Content-Type: application/json' \
+  -H 'X-Api-Key: READONLYKEY' \
+  --insecure \
+  -d '
+  {
+    "requests": {
+      "label": {
+          "type": "HISTORICAL_POINT",
+          "tag": "Demo-influxdb/DEMO_02TI301.PV",
+          "details": {
+            "at": "2023-09-25T17:29:04+02:00" // Any ISO or unix timestamp supported
+          }
+      }
+    }
+  }
+'
+```
+
+</TabItem>
+<TabItem label="Interpolated">
+
+**Request Type**
+
+INTERPOLATED_POINTS
+
+**Input Parameters**
+
+- **from**: timestamp
+- **to**: timestamp
+- **count**: integer (Optional)
+
+**Description**
+
+Return evenly-spaced points of exact number as specified in count. First point is at from, last point is at to. If count is not passed, defaults to 1000.
+
+**Example**
+
+**_Request_**:
+
+```json
+{
+  "requests": {
+    "label": {
+      "type": "INTERPOLATED_POINTS",
+      "tag": "calc/TOTALISE2(constants/1, MONTH, BEGIN_MONTH, 1d)",
+      "details": {
+        "from": "7 days ago at 00:00", // Accepts ISO, unix timestmaps, or relative times like this
+        "to": "today at midnight",
+        "count": 8
+      }
+    }
+  }
+}
+```
+
+**_Result_**:
+
+```json
+{
+  "results": {
+    "label": {
+      "dataPoints": [
+        {
+          "timestamp": "2023-09-18T00:00:00+02:00",
+          "value": 17.00000000000012
+        },
+        {
+          "timestamp": "2023-09-19T00:00:00+02:00",
+          "value": 18.000000000000117
+        },
+        {
+          "timestamp": "2023-09-20T00:00:00+02:00",
+          "value": 19.000000000000114
+        },
+        {
+          "timestamp": "2023-09-21T00:00:00+02:00",
+          "value": 20.00000000000011
+        },
+        {
+          "timestamp": "2023-09-22T00:00:00+02:00",
+          "value": 21.000000000000107
+        },
+        {
+          "timestamp": "2023-09-23T00:00:00+02:00",
+          "value": 22.000000000000103
+        },
+        {
+          "timestamp": "2023-09-24T00:00:00+02:00",
+          "value": 23.0000000000001
+        },
+        {
+          "timestamp": "2023-09-25T00:00:00+02:00",
+          "value": 24.000000000000096
+        }
+      ]
+    }
+  },
+  "errors": {},
+  "now": "2023-09-25T17:36:12.872535267+02:00"
+}
+```
+
+**Curl Sample**
+
+```bash
+curl -X POST \
+https://demo.eigen.co/historian/multi \
+-H 'Content-Type: application/json' \
+-H 'X-Api-Key: READONLYKEY' \
+--insecure \
+-d '
+{
+  "now": "2023-04-05T12:00:00Z",
+  "requests": {
+    "label": {
+      "type": "INTERPOLATED_POINTS",
+      "tag": "calc/TOTALISE2(constants/1, MONTH, BEGIN_MONTH, 1d)",
+      "details": {
+        "from": "7 days ago at 00:00",
+        "to": "today at midnight",
+        "count": 8
+      }
+    }
+  }
+}
+'
+```
+
+</TabItem>
+
+<TabItem label="Raw Points">
+
+**Request Type**
+
+RAW_POINTS
+
+**Input Parameters**
+
+- **from**: timestamp
+- **to**: timestamp
+- **maxPoints**: integer (Optional)
+- **leftBoundary**: string **[INCLUDE|EXCLUDE|NEAREST|INTERPOLATED]** (Optional)
+- **rightBoundary**: string **[INCLUDE|EXCLUDE|NEAREST|INTERPOLATED]** (Optional)
+
+**Description**
+
+Returns raw points from given range, up to maxPoints readings. If maxPoints not passed, defaults to 1000.
+leftBoundary, rightBoundary:
+determine whether to include raw points that fall exactly upon a boundary timestamp
+
+- **INCLUDE**: Include a raw point that falls exactly upon boundary timestamp (default for leftBoundary)
+- **EXCLUDE**: Exclude a raw point that falls exactly upon boundary timestamp (default for rightBoundary)
+- **NEAREST**: Nearest point outside of range
+- **INTERPOLATED**: Interpolated value exactly at boundary
+
+**Example**
+
+**_Request_**:
+
+```json
+{
+  "requests": {
+    "label": {
+      "type": "RAW_POINTS",
+      "tag": "calc/TOTALISE2(constants/1, MONTH, BEGIN_MONTH, 1d)",
+      "details": {
+        "from": "7 days ago at 00:00", // Accepts ISO, unix timestmaps, or relative times like this
+        "to": "today at midnight",
+        "count": 8
+      }
+    }
+  }
+}
+```
+
+**_Result_**:
+
+```json
+{
+  "results": {
+    "label": {
+      "dataPoints": [
+        {
+          "timestamp": "2026-04-17T00:00:00Z",
+          "value": 16.0,
+          "enumString": null,
+          "message": null
+        },
+        {
+          "timestamp": "2026-04-23T23:59:59.999Z",
+          "value": 22.999999988425927,
+          "enumString": null,
+          "message": null
+        }
+      ],
+      "enumDictionary": {}
+    }
+  },
+  "errors": {},
+  "now": "2026-04-24T14:48:20.354958445Z"
+}
+```
+
+**Curl Sample**
+
+```bash
+curl -X POST \
+https://demo.eigen.co/historian/multi \
+-H 'Content-Type: application/json' \
+-H 'X-Api-Key: READONLYKEY' \
+--insecure \
+-d '
+{
+  "requests": {
+    "label": {
+        "type": "RAW_POINTS",
+        "tag": "calc/TOTALISE2(constants/1, MONTH, BEGIN_MONTH, 1d)",
+        "details": {
+            "from": "7 days ago at 00:00", // Accepts ISO, unix timestmaps, or relative times like this
+            "to": "today at midnight",
+            "count": 8
+        }
+    }
+  }
+}
+'
+```
+
+</TabItem>
+<TabItem label="Closest Raw Point">
+
+**Request Type**
+
+There are 5 methods for this operation
+
+- POINT_BEFORE
+- POINT_BEFORE_OR_AT
+- POINT_AFTER
+- POINT_AFTER_OR_AT
+- ADJACENT_POINTS
+
+**Input Parameters**
+
+- **at**: timestamp
+
+**Description**
+
+Returns the closest raw point(s) to aprovided timestamp
+
+- **POINT_BEFORE**: Return the latest raw point BEFORE the provided timestamp (Ignore point AT provided timestamp if found)
+- **POINT_BEFORE_OR_AT**: Return the latest raw point BEFORE OR AT the provided timestamp
+- **POINT_AFTER**: Return the latest raw point AFTER the provided timestamp (Ignore point AT provided timestamp if found)
+- **POINT_AFTER_OR_AT**: Return the latest raw point AFTER OR AT the provided timestamp
+- **ADJACENT_POINTS**: Return up to three points - One (Interpolated if no raw) exactly at timestamp, closest raw point before, closest raw point after
+
+**Example**
+
+**_Request_**:
+
+```json
+{
+  "requests": {
+    "BEFORE_OR_AT": {
+      "type": "POINT_BEFORE_OR_AT",
+      "tag": "Demo-influxdb/DEMO_02TI301.PV",
+      "details": {
+        "at": "yesterday"
+      }
+    },
+    "AFTER_OR_AT": {
+      "type": "POINT_AFTER_OR_AT",
+      "tag": "Demo-influxdb/DEMO_02TI301.PV",
+      "details": {
+        "at": "yesterday"
+      }
+    },
+    "AFTER": {
+      "type": "POINT_AFTER",
+      "tag": "Demo-influxdb/DEMO_02TI301.PV",
+      "details": {
+        "at": "yesterday"
+      }
+    },
+    "BEFORE": {
+      "type": "POINT_BEFORE",
+      "tag": "Demo-influxdb/DEMO_02TI301.PV",
+      "details": {
+        "at": "yesterday"
+      }
+    },
+    "ADJACENT": {
+      "type": "ADJACENT_POINTS",
+      "tag": "Demo-influxdb/DEMO_02TI301.PV",
+      "details": {
+        "at": "yesterday"
+      }
+    }
+  }
+}
+```
+
+**_Result_**:
+
+```json
+{
+  "results": {
+    "BEFORE_OR_AT": {
+      "dataPoint": {
+        "timestamp": "2026-04-22T23:59:49Z",
+        "value": 33.0,
+        "enumString": null,
+        "message": null
+      }
+    },
+    "BEFORE": {
+      "dataPoint": {
+        "timestamp": "2026-04-22T23:59:49Z",
+        "value": 33.0,
+        "enumString": null,
+        "message": null
+      }
+    },
+    "AFTER": {
+      "dataPoint": {
+        "timestamp": "2026-04-23T00:00:01Z",
+        "value": 35.0,
+        "enumString": null,
+        "message": null
+      }
+    },
+    "AFTER_OR_AT": {
+      "dataPoint": {
+        "timestamp": "2026-04-23T00:00:01Z",
+        "value": 35.0,
+        "enumString": null,
+        "message": null
+      }
+    },
+    "ADJACENT": {
+      "before": {
+        "timestamp": "2026-04-22T23:59:49Z",
+        "value": 33.0,
+        "enumString": null,
+        "message": null
+      },
+      "at": {
+        "timestamp": "2026-04-23T00:00:00Z",
+        "value": 34.833333333333336,
+        "enumString": null,
+        "message": null
+      },
+      "after": {
+        "timestamp": "2026-04-23T00:00:01Z",
+        "value": 35.0,
+        "enumString": null,
+        "message": null
+      }
+    }
+  },
+  "errors": {},
+  "now": "2026-04-24T15:03:20.568164457Z"
+}
+```
+
+**Curl Sample**
+
+```bash
+curl -X POST \
+https://demo.eigen.co/historian/multi \
+-H 'Content-Type: application/json' \
+-H 'X-Api-Key: READONLYKEY' \
+--insecure \
+-d '
+{
+  "requests": {
+    "BEFORE_OR_AT": {
+      "type": "POINT_BEFORE_OR_AT",
+      "tag": "Demo-influxdb/DEMO_02TI301.PV",
+      "details": {
+        "at": "yesterday"
+      }
+    },
+    "AFTER_OR_AT": {
+      "type": "POINT_AFTER_OR_AT",
+      "tag": "Demo-influxdb/DEMO_02TI301.PV",
+      "details": {
+        "at": "yesterday"
+      }
+    },
+    "AFTER": {
+      "type": "POINT_AFTER",
+      "tag": "Demo-influxdb/DEMO_02TI301.PV",
+      "details": {
+        "at": "yesterday"
+      }
+    },
+    "BEFORE": {
+      "type": "POINT_BEFORE",
+      "tag": "Demo-influxdb/DEMO_02TI301.PV",
+      "details": {
+        "at": "yesterday"
+      }
+    },
+    "ADJACENT": {
+      "type": "ADJACENT_POINTS",
+      "tag": "Demo-influxdb/DEMO_02TI301.PV",
+      "details": {
+        "at": "yesterday"
+      }
+    }
+  }
+}
+'
+```
+
+</TabItem>
+<TabItem label="Aggregates">
+**Request Type**
+
+There are 2 methods for this operation
+
+- AGGREGATED_POINTS
+- MULTIPLE_AGGREGATED_POINTS
+
+**Input Parameters**
+
+- **from**: timestamp
+- **to**: timestamp
+- **aggregates**: array
+- **count**: int (MULTIPLE_AGGREGATED_POINTS only)
+
+**Description**
+
+Returns aggregate data for timeseries over a provided timeframe
+
+- **AGGREGATED_POINTS**: Return aggregated values over entire period between provided timestamps.
+- **MULTIPLE_AGGREGATED_POINTS**: Return aggregated values between `count` subintervals of equal size over provided interval.
+
+**Available Aggregates**:
+
+- MIN
+- MAX
+- FIRST
+- LAST
+- MEDIAN
+- AVG
+- VAR
+- STDDEV
+- COUNT
+- NUMGOOD
+- NUMBAD
+
+:::note
+The API response will always return an entry for each aggregate, but unrequested aggregates will not be calculated, and will contain placeholders such as `"NaN"` , `null` or `0`. If you wish to use a resulting aggregate, ensure you included it in your request
+:::
+**Example**
+
+**_Request_**:
+
+```json
+{
+  "requests": {
+    "AGGREGATES": {
+      "type": "AGGREGATED_POINTS",
+      "tag": "Demo-influxdb/DEMO_02TI301.PV",
+      "details": {
+        "from": "1 month ago at 00:00",
+        "to": "today at midnight",
+        "aggregates": ["AVG", "MIN", "MAX"]
+      }
+    },
+    "MULTIPLE_AGGREGATES": {
+      "type": "MULTIPLE_AGGREGATED_POINTS",
+      "tag": "Demo-influxdb/DEMO_02TI301.PV",
+      "details": {
+        "from": "1 month ago at 00:00",
+        "to": "today at midnight",
+        "aggregates": ["AVG"],
+        "count": 3
+      }
+    }
+  }
+}
+```
+
+**_Result_**:
+
+```json
+{
+  "results": {
+    "MULTIPLE_AGGREGATES": {
+      "aggregates": [
+        {
+          "from": "2026-03-24T00:00:00Z",
+          "to": "2026-04-03T08:00:00Z",
+          "min": "NaN",
+          "max": "NaN",
+          "count": 0,
+          "avg": 35.49367829548115,
+          "stdDev": 0.0,
+          "variance": 0.0,
+          "median": null,
+          "first": null,
+          "last": null,
+          "numGood": 0,
+          "numBad": 0
+        },
+        {
+          "from": "2026-04-03T08:00:00Z",
+          "to": "2026-04-13T16:00:00Z",
+          "min": "NaN",
+          "max": "NaN",
+          "count": 0,
+          "avg": 35.50583924209021,
+          "stdDev": 0.0,
+          "variance": 0.0,
+          "median": null,
+          "first": null,
+          "last": null,
+          "numGood": 0,
+          "numBad": 0
+        },
+        {
+          "from": "2026-04-13T16:00:00Z",
+          "to": "2026-04-24T00:00:00Z",
+          "min": "NaN",
+          "max": "NaN",
+          "count": 0,
+          "avg": 35.490705059037516,
+          "stdDev": 0.0,
+          "variance": 0.0,
+          "median": null,
+          "first": null,
+          "last": null,
+          "numGood": 0,
+          "numBad": 0
+        }
+      ]
+    },
+    "AGGREGATES": {
+      "aggregates": [
+        {
+          "from": "2026-03-24T00:00:00Z",
+          "to": "2026-04-24T00:00:00Z",
+          "min": 33.0,
+          "max": 38.0,
+          "count": 0,
+          "avg": 35.49666321977748,
+          "stdDev": 0.0,
+          "variance": 0.0,
+          "median": null,
+          "first": null,
+          "last": null,
+          "numGood": 0,
+          "numBad": 0
+        }
+      ]
+    }
+  },
+  "errors": {},
+  "now": "2026-04-24T15:11:47.545179141Z"
+}
+```
+
+**Curl Sample**
+
+```bash
+curl -X POST \
+https://demo.eigen.co/historian/multi \
+-H 'Content-Type: application/json' \
+-H 'X-Api-Key: READONLYKEY' \
+--insecure \
+-d '
+{
+    "requests": {
+        "AGGREGATES": {
+            "type": "AGGREGATED_POINTS",
+            "tag": "Demo-influxdb/DEMO_02TI301.PV",
+            "details": {
+                "from": "1 month ago at 00:00",
+                "to": "today at midnight",
+                "aggregates": ["AVG","MIN","MAX"]
+            }
+        },
+        "MULTIPLE_AGGREGATES": {
+            "type": "MULTIPLE_AGGREGATED_POINTS",
+            "tag": "Demo-influxdb/DEMO_02TI301.PV",
+            "details": {
+                "from": "1 month ago at 00:00",
+                "to": "today at midnight",
+                "aggregates": ["AVG"],
+                "count": 3
+            }
+        }
+    }
+}
+'
+```
+
+</TabItem>
+</Tabs>
