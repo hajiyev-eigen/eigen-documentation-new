@@ -41,7 +41,6 @@ export default defineConfig({
       },
       customCss: ['./src/styles/custom.css'],
       sidebar: [
-
         {
           label: 'Getting Started',
           items: [
@@ -65,8 +64,8 @@ export default defineConfig({
               autogenerate: {
                 directory: 'getting-started/Installation Guide',
               },
-            }
-          ]
+            },
+          ],
         },
 
         {
@@ -121,21 +120,27 @@ export default defineConfig({
                 directory: 'modules/Data Sources',
               },
             },
-            
           ],
         },
         {
           label: 'Developing with Eigen',
           items: [
             {
-              collapsed:true,
+              collapsed: true,
+              label: 'API Reference',
+              autogenerate: {
+                directory: 'developing-with-eigen/api-reference',
+              },
+            },
+            {
+              collapsed: true,
               label: 'Excel Addin',
               autogenerate: {
                 directory: 'developing-with-eigen/excel-addin',
               },
             },
             {
-              collapsed:true,
+              collapsed: true,
               label: 'Python Library',
               items: [
                 {
@@ -206,7 +211,7 @@ export default defineConfig({
               ],
             },
             {
-              collapsed:true,
+              collapsed: true,
               label: 'Office 365 Connector',
               badge: {
                 text: 'TBA',

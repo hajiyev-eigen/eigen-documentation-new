@@ -1,0 +1,268 @@
+---
+title: Writing Data
+description: Writing Values to the Historian API
+sidebar:
+  order: 4
+---
+
+Historian Multi Write API is set of Ingenuity APIs for creating tags and writing timeseries data to ingenuity databases for use on the Ingenuity Platform
+
+## 1. Authentication
+
+All requests need to be authenticated using API Key, passed as apikey query parameter or X-Api-Key HTTP header.
+
+## 2. Limits
+
+Write operations can only be performed on historians marked writable. Often this will not include Client production systems, as we maintain a read-only connection, so write data will be often need to be stored in a writable timeseries database local to the Ingenuity.
+
+Details on listing the available Writable historians can be found with the `List Historians` method detailed below
+
+## 3. Request Methods
+
+All operations require a "writable" historian name, and a tag name
+
+Some methods require a field of type "timestamp", our APIs accept several formats for these values:
+
+- Most ISO Formats
+  - 2026-04-22T23:59:49Z
+  - 2026-04-22T21:59:49+02:00
+  - 2026-04-22T21:59:49[Europe/Oslo]
+- Unix/Epoch Seconds or Milliseconds
+  - 1776902389
+  - 1776902389000
+- Relative Timestamps
+  - now
+  - yesterday
+  - 4 hours ago
+  - 7 days ago at 00:00
+  - today at midnight
+
+<Tabs>
+<TabItem label="List Historians">
+  
+  **Request Paths**
+    
+  GET  /historian/list
+
+GET /historian/listwritable
+
+**Input Parameters**
+N/A
+
+**Description**
+
+List all historians available on the Ingenuity Instance, or only the ones that are flagged as writeable
+
+**Example**:
+
+**_Result_**
+
+All Historians:
+
+```json
+{
+  "historians": [
+    {
+      "name": "eigen_manual_input"
+    },
+    {
+      "name": "IP21"
+    }
+  ]
+}
+```
+
+Writable Historians:
+
+```json
+{
+  "historians": [
+    {
+      "name": "eigen_manual_input"
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem label="Create Tag"> 
+  
+**Request Path**
+    
+  POST /historian/metadata/create
+
+**Input Parameters**
+
+- **description**: string (Optional)
+- **units**: string (Optional)
+- **stepped**: boolean (Optional)
+- **updateIfExists**: boolean (Optional)
+
+**Description**
+
+Create new tag with defined metadata.
+
+If an already existing tag is specified, it won’t be overwriten unless updateIfExists is set to true.
+
+Note that if a field in metadata won’t be provided, it will be stored as empty/null/false value according to its type.
+
+**Example**
+
+**_Request_**:
+
+```json
+{
+  "entries": {
+    "influxdb/newtag": {
+      "description": "description",
+      "units": "m3",
+      "stepped": false
+    }
+  },
+  "updateIfExists": false
+}
+```
+
+**_Result_**:
+
+```json
+{
+  "handledEntries": {
+    "influxdb/newtag": {
+      "description": "description",
+      "units": "m3",
+      "stepped": false
+    }
+  },
+  "errors": {}
+}
+```
+
+</TabItem>
+<TabItem label="Update Tag"> 
+  
+**Request Path**
+    
+  POST /historian/metadata/update
+
+**Input Parameters**
+
+- **description**: string (Optional)
+- **units**: string (Optional)
+- **stepped**: boolean (Optional)
+- **createIfMissing**: boolean (Optional)
+
+**Description**
+
+Update specified tags with provided metadata.
+
+If not a tag that does not exist is specified, it won’t be created unless `createIfMissing` is set to true.
+
+Note that if a field in metadata won’t be provided, it will be stored as empty/null/false value according to its type.
+
+**Example**
+
+**_Request_**:
+
+```json
+{
+  "entries": {
+    "influxdb/existingTag": {
+      "description": "description",
+      "units": "m3",
+      "stepped": false
+    }
+  },
+  "createIfMissing": false
+}
+```
+
+**_Result_**:
+
+```json
+{
+  "handledEntries": {
+    "eigen_manual_input/existingTag": {
+      "description": "description",
+      "units": "m3",
+      "stepped": false
+    }
+  },
+  "errors": {}
+}
+```
+
+</TabItem>
+<TabItem label="Write Datapoints"> 
+  
+**Request Path**
+    
+  POST /historian/write/points
+
+**Input Parameters**
+
+- **timestamp**: timestamp
+- **value**: double/integer
+- **status**: string **[BAD|OK]** (Optional)
+
+**Description**
+
+This request can write multiple data points to multiple tags in single HTTP call. Request will be checked if historians are writable, tag exist and if any issues were found, no points will be written.
+
+Depending on createTags field tags may be automatically created if they do not exist
+
+**Example**
+
+**_Request_**:
+
+```json
+{
+  "points": {
+    "eigen_manual_input/temperature": [
+      {
+        "timestamp": "2024-02-01T12:33:44Z",
+        "status": "OK",
+        "value": 23.6
+      },
+      {
+        "timestamp": "2024-02-01T12:37:11Z",
+        "status": "OK",
+        "value": 23.2
+      }
+    ]
+  },
+  "createTags": true
+}
+```
+
+**_Result_**:
+
+**Success**
+
+```json
+{
+  "message": "All points written!",
+  "errors": []
+}
+```
+
+**When Passing Bad Historian**
+
+```json
+{
+  "message": "There were errors in the request",
+  "errors": ["Historian nonexistent for tag temperature does not exist"]
+}
+```
+
+**When Passing unhandled timestamp format**
+
+```json
+{
+  "message": "There were errors in the request",
+  "errors": ["Error: Cannot parse type abcdef as time input for tag sqldbhistorian/temperature"]
+}
+```
+
+</TabItem>
+</Tabs>
